@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Days Until Next Friday the 13th</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Next Friday the 13th</h1>
+        <input type="date" id="dateInput">
+        <br>
+        <button onclick="handleCheck()">Find</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function parseDate(dateString) {
+            const [year, month, day] = dateString.split("-").map(Number);
+            return { year, month, day };
+        }
+
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        }
+
+        function getDaysInMonth(month, year) {
+            const monthDays = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30,
+                31, 31, 30, 31, 30, 31];
+            return monthDays[month - 1]; // month is 1-based
+        }
+
+        // Zeller's Congruence to calculate day of the week
+        function getDayOfWeek(year, month, day) {
+            if (month < 3) {
+                month += 12;
+                year -= 1;
+            }
+            const q = day;
+            const m = month;
+            const k = year % 100;
+            const j = Math.floor(year / 100);
+
+            const h = (q + Math.floor((13 * (m + 1)) / 5) +
+                k + Math.floor(k / 4) +
+                Math.floor(j / 4) + 5 * j) % 7;
+
+            // Convert Zeller's output to: 0 = Sunday, ..., 6 = Saturday
+            return (h + 6) % 7;
+        }
+
+        // Add one day to a date object (manually handles day/month/year)
+        function addOneDay({ year, month, day }) {
+            day++;
+            const dim = getDaysInMonth(month, year);
+            if (day > dim) {
+                day = 1;
+                month++;
+                if (month > 12) {
+                    month = 1;
+                    year++;
+                }
+            }
+            return { year, month, day };
+        }
+
+        // Find the number of days until next Friday the 13th
+        function findNextFriday13(startDate) {
+            let { year, month, day } = startDate;
+            let daysPassed = 0;
+
+            // Move to the next day
+            let current = addOneDay({ year, month, day });
+            daysPassed++;
+
+            while (true) {
+                // Check if the 13th of this month is a Friday
+                const weekday = getDayOfWeek(current.year, current.month, 13);
+                if (weekday === 5) { // 5 = Friday
+                    return {
+                        nextFriday13: { year: current.year, month: current.month, day: 13 },
+                        daysUntil: daysPassed + (13 - current.day)
+                    };
+                }
+
+                // Move to next month on day 1
+                const daysInCurrentMonth = getDaysInMonth(current.month, current.year);
+                daysPassed += (daysInCurrentMonth - current.day + 1); // finish current month
+                current.day = 1;
+                current.month++;
+                if (current.month > 12) {
+                    current.month = 1;
+                    current.year++;
+                }
+            }
+        }
+
+        // Main function triggered on button click
+        function handleCheck() {
+            const input = document.getElementById("dateInput").value;
+            const result = document.getElementById("result");
+
+            // Basic input validation
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) {
+                result.textContent = "Please enter a valid date in YYYY-MM-DD format.";
+                return;
+            }
+
+            try {
+                const date = parseDate(input);
+                const output = findNextFriday13(date);
+
+                const { year, month, day } = output.nextFriday13;
+                const formattedDate = `${day}/${String(month).padStart(2, '0')}/${year}`;
+                result.textContent = `${output.daysUntil} days until next Friday the 13th. On ${formattedDate}`;
+            } catch (err) {
+                result.textContent = "An error occurred. Please check your input.";
+            }
+        }
+    </script>
+</body>
+
+</html>

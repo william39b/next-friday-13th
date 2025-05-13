@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Days Until Next Friday the 13th</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Next Friday the 13th</h1>
+        <input type="date" id="dateInput">
+        <br>
+        <button onclick="findNextFriday13()">Find</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function findNextFriday13() {
+            console.log(new Date(document.getElementById('dateInput').value));
+            const input = document.getElementById('dateInput').value;
+            const result = document.getElementById('result');
+
+            if (!input) {
+                result.textContent = "Please enter a date.";
+                return;
+            }
+
+            let date = new Date(input);
+            date.setDate(date.getDate() + 1); // Start checking from the next day
+
+            while (true) {
+                const day = date.getDay(); // 5 = Friday
+                const dateNum = date.getDate(); // 13 = 13th day of month
+
+                if (day === 5 && dateNum === 13) {
+                    break;
+                }
+
+                date.setDate(date.getDate() + 1);
+            }
+
+            const inputDate = new Date(input);
+            const diffTime = date - inputDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            result.textContent = `The next Friday the 13th is on ${date.toDateString()} — ${diffDays} day(s) away.`;
+        }
+    </script>
+</body>
+
+</html>
