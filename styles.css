@@ -114,7 +114,7 @@ button:hover {
     display: none;
 }
 
-#blood-overlay {
+/* #blood-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -125,4 +125,18 @@ button:hover {
     opacity: 0.2;
     z-index: 1;
     display: none;
+} */
+
+#blood-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;     /* full viewport width */
+    height: 100vh;    /* full viewport height */
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 0.2;
+    z-index: 1;
+    pointer-events: none; /* so it doesn't block clicks */
 }
