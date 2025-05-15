@@ -7,13 +7,21 @@
 </head>
 
 <body>
+    <div id="main-bg"></div>
     <div class="container">
-        <h1>Next Friday the 13th</h1>
+        <h1>Next Friday the <span class="red">13th</span></h1>
         <input type="date" id="dateInput">
         <br>
         <button onclick="handleCheck()">Find</button>
         <p id="result"></p>
     </div>
+    <img id="jason" src="img/jason.png" alt="Jason">
+    <img id="jason2" src="img/jason2.png" alt="Jason2">
+    <img id="jason3" src="img/jason3.png" alt="Jason3">
+    <img id="jason4" src="img/jason4.png" alt="Jason4">
+    <audio id="friday13" src="audio/chchch.mp3" preload="auto"></audio>
+    <audio id="scream" src="audio/wilhelmscream.mp3" preload="auto"></audio>
+    <div id="blood-overlay"></div>
 
     <script>
         function parseDate(dateString) {
@@ -70,23 +78,42 @@
             let { year, month, day } = startDate;
             let daysPassed = 0;
 
-            // Move to the next day
+            // Start counting from the next day (this is good)
             let current = addOneDay({ year, month, day });
             daysPassed++;
 
             while (true) {
                 // Check if the 13th of this month is a Friday
                 const weekday = getDayOfWeek(current.year, current.month, 13);
+
                 if (weekday === 5) { // 5 = Friday
+                    // Calculate days until the 13th of current month
+                    let daysUntil13th = daysPassed + (13 - current.day);
+
+                    // If daysUntil13th is negative or zero, skip to next month
+                    if (daysUntil13th <= 0) {
+                        // Move to next month on day 1
+                        const daysInCurrentMonth = getDaysInMonth(current.month, current.year);
+                        daysPassed += (daysInCurrentMonth - current.day + 1);
+                        current.day = 1;
+                        current.month++;
+                        if (current.month > 12) {
+                            current.month = 1;
+                            current.year++;
+                        }
+                        continue; 
+                    }
+
+                    // Return next Friday the 13th and days until
                     return {
                         nextFriday13: { year: current.year, month: current.month, day: 13 },
-                        daysUntil: daysPassed + (13 - current.day)
+                        daysUntil: daysUntil13th
                     };
                 }
 
-                // Move to next month on day 1
+                // If 13th is not Friday, jump to next month
                 const daysInCurrentMonth = getDaysInMonth(current.month, current.year);
-                daysPassed += (daysInCurrentMonth - current.day + 1); // finish current month
+                daysPassed += (daysInCurrentMonth - current.day + 1);
                 current.day = 1;
                 current.month++;
                 if (current.month > 12) {
@@ -96,16 +123,92 @@
             }
         }
 
+
+        window.onload = function() {
+            document.getElementById("result").innerHTML = "";  // Clear any text on load
+            document.getElementById("dateInput").value = "";  // Clear input on load
+            document.getElementById("jason").style.display = "none";  // Hide Jason images initially
+            document.getElementById("jason2").style.display = "none";
+            document.getElementById("jason3").style.display = "none";
+
+            document.getElementById("dateInput").addEventListener("keydown", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    handleCheck();
+                }
+            });
+        };
+
         function handleCheck() {
+            const audio = document.getElementById("friday13");
+            const scream = document.getElementById("scream");
+            const bloodOverlay = document.getElementById("blood-overlay");
+
             const input = document.getElementById("dateInput").value;
             const result = document.getElementById("result");
-           
+
+            if (!input) {
+                result.innerHTML = "Please select a date.";
+                return;
+            }
+
             const date = parseDate(input);
             const output = findNextFriday13(date);
             const { year, month, day } = output.nextFriday13;
             const formattedDate = `${day}/${String(month).padStart(2, '0')}/${year}`;
-            result.textContent = `${output.daysUntil} days until next Friday the 13th. On ${formattedDate}`;
+            result.innerHTML = `${output.daysUntil} days until next Friday the 13th. <br> On ${formattedDate}`;
+
+            const jason = document.getElementById("jason");
+            const jason2 = document.getElementById("jason2");
+            const jason3 = document.getElementById("jason3");
+            const jason4 = document.getElementById("jason4");
+
+            const selectWeekday = getDayOfWeek(date.year, date.month, date.day);
+            const isFriday13thNow = date.day === 13 && selectWeekday === 5;
+
+            if (isFriday13thNow) {
+                jason.style.display = "none";
+                jason2.style.display = "none";
+                jason3.style.display = "none";
+                jason4.style.display = "block";
+
+                scream.volume = 0.2;
+                scream.currentTime = 0;
+                scream.play().catch((e) => {
+                    console.warn("Scream audio play failed:", e);
+                });
+
+                // Show blood2.png overlay when jason4 visible
+                bloodOverlay.style.backgroundImage = "url('img/blood2.png')";
+            } else {
+                audio.volume = 0.2;
+                audio.currentTime = 0;
+                audio.play().catch((e) => {
+                    console.warn("Friday13 audio play failed:", e);
+                });
+
+                if (output.daysUntil >= 201) {
+                    jason.style.display = "block";
+                    jason2.style.display = "none";
+                    jason3.style.display = "none";
+                    jason4.style.display = "none";
+                } else if (output.daysUntil >= 51 && output.daysUntil <= 200) {
+                    jason.style.display = "none";
+                    jason2.style.display = "block";
+                    jason3.style.display = "none";
+                    jason4.style.display = "none";
+                } else if (output.daysUntil >= 1 && output.daysUntil <= 50) {
+                    jason.style.display = "none";
+                    jason2.style.display = "none";
+                    jason3.style.display = "block";
+                    jason4.style.display = "none";
+                }
+
+                // Show blood.png overlay when jason, jason2 or jason3 visible
+                bloodOverlay.style.backgroundImage = "url('img/blood.png')";
+            }
         }
+
     </script>
 </body>
 
