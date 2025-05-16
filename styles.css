@@ -76,9 +76,9 @@ button:hover {
 
 #jason {
     position: fixed;
-    left: 1700px;
+    left: 85%;
     top: 50%;
-    height: 200px;
+    height: 15vh;
     z-index: 10;
     pointer-events: none;
     display: none;
@@ -86,9 +86,9 @@ button:hover {
 
 #jason2 {
     position: fixed;
-    right: 150px;
+    left: 75%;
     top: 35%;
-    height: 600px;
+    height: 45vh;
     z-index: 10;
     pointer-events: none;
     display: none;
@@ -96,9 +96,9 @@ button:hover {
 
 #jason3 {
     position: fixed;
-    left: 1000px;
-    top: 20%;
-    height: 700px;
+    left: 60%;
+    top: 30%;
+    height: 45vh;
     z-index: 10;
     pointer-events: none;
     display: none;
@@ -106,9 +106,11 @@ button:hover {
 
 #jason4 {
     position: fixed;
-    left: 1rem;
-    top: -8%;
-    height: 150%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); 
+    height: 110vh; 
+    width: auto;
     z-index: 10;
     pointer-events: none;
     display: none;
